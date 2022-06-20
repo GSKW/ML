@@ -6,6 +6,7 @@ if __name__ == "__main__":
     import numpy as np
     from sklearn import datasets
     from sklearn.model_selection import train_test_split
+
     from decision_tree import DecisionTree
 
     def accuracy(y_true, y_pred):
