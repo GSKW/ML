@@ -3,11 +3,12 @@ import network as net
 from PIL import Image
 import numpy as np
 import PIL
-
+import torch
 
 st.title("Are you a dog or a cat?")
 
 model = net.load_model('../NET.pth')
+
 
 
 def heat_to_image(heatmap: PIL.Image, image: PIL.Image) -> PIL.Image:
@@ -31,6 +32,10 @@ if image is not None:
     heatmap = net.compute_saliency_maps(img, pred, model)
     image_heatmap = Image.fromarray((heatmap*255).astype('uint8'), mode="L")
     st.image(heat_to_image(image_heatmap.resize(img.size), img))
+
+    np_tweaked_img = net.tweak_image(img, torch.tensor(1-pred), model)
+    tweaked_img = Image.fromarray((np_tweaked_img*255).astype('uint8'), mode='RGB')
+    st.image(tweaked_img.resize(img.size))
     if pred.item():
         st.write("U r a dog!!!")
     else:
