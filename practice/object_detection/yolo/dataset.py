@@ -33,7 +33,7 @@ class VOCDataset(torch.utils.data.Dataset):
             'person',
             'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
             'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
-            'bottle', 'chair', 'dining table', 'potted plant', 'sofa', 'tvmonitor'
+            'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor'
         ]
 
     def __len__(self):
