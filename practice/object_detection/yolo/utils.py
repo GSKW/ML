@@ -239,15 +239,14 @@ def plot_image(image, boxes):
 
     plt.show()
 
-def get_bboxes(
-    loader,
-    model,
-    iou_threshold,
-    threshold,
-    pred_format="cells",
-    box_format="midpoint",
-    device="cuda",
-):
+
+def get_bboxes(loader,
+               model: "nn.Module",
+               iou_threshold: float,
+               threshold: float,
+               pred_format: str = "cells",
+               box_format: str = "midpoint",
+               device: str = "cuda"):
     all_pred_boxes = []
     all_true_boxes = []
 
@@ -274,7 +273,6 @@ def get_bboxes(
                 box_format=box_format,
             )
 
-
             #if batch_idx == 0 and idx == 0:
             #    plot_image(x[idx].permute(1,2,0).to("cpu"), nms_boxes)
             #    print(nms_boxes)
@@ -291,7 +289,6 @@ def get_bboxes(
 
     model.train()
     return all_pred_boxes, all_true_boxes
-
 
 
 def convert_cellboxes(predictions, S=7):

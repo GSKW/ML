@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
 from typing import Optional, Callable, Tuple
 
 import torch
-import pandas as pd
 from PIL import Image
 from torchvision.datasets import VOCDetection
 
