@@ -51,142 +51,51 @@ class Yolov1(nn.Module):
     def _create_conv_layers(self, in_channels: int):
         pool = nn.MaxPool2d(2, 2)
         
-        conv1 = CNNBlock(
-            in_channels=3,
-            out_channels=192,
-            kernel_size=(7,7),
-            stride=2,
-            padding=3,
-            groups=3
-        )
-        conv2 = CNNBlock(
-            in_channels=192,
-            out_channels=256,
-            kernel_size=(3,3),
-            stride=1,
-            padding=1,
-            groups=1
-        )
-        conv3_1 = CNNBlock(
-            in_channels=256,
-            out_channels=128,
-            kernel_size=(1,1),
-            stride=1,
-            padding=0,
-            groups=1
-        )
-        conv3_2 = CNNBlock(
-            in_channels=128,
-            out_channels=256,
-            kernel_size=(3,3),
-            stride=1,
-            padding=1,
-            groups=1
-        )
-        conv3_3 = CNNBlock(
-            in_channels=256,
-            out_channels=256,
-            kernel_size=(1,1),
-            stride=1,
-            padding=0,
-            groups=1
-        )
-        conv3_4 = CNNBlock(
-            in_channels=256,
-            out_channels=512,
-            kernel_size=(3,3),
-            stride=1,
-            padding=1,
-            groups=1
-        )
-        conv4_1 = CNNBlock(
-            in_channels=512,
-            out_channels=256,
-            kernel_size=(1,1),
-            stride=1,
-            padding=0,
-            groups=1
-        )
-        conv4_2 = CNNBlock(
-            in_channels=256,
-            out_channels=512,
-            kernel_size=(3,3),
-            stride=1,
-            padding=1,
-            groups=1
-        )
-        
-        conv4_3 = CNNBlock(
-            in_channels=512,
-            out_channels=512,
-            kernel_size=(1,1),
-            stride=1,
-            padding=0,
-            groups=1
-        )
-        conv4_4 = CNNBlock(
-            in_channels=512,
-            out_channels=1024,
-            kernel_size=(3,3),
-            stride=1,
-            padding=1,
-            groups=1
-        )
-        conv5_1 = CNNBlock(
-            in_channels=1024,
-            out_channels=512,
-            kernel_size=(1,1),
-            stride=1,
-            padding=0,
-            groups=1
-        )
-        conv5_2 = CNNBlock(
-            in_channels=512,
-            out_channels=1024,
-            kernel_size=(3,3),
-            stride=1,
-            padding=1,
-            groups=1
-        )
-        conv5_3 = CNNBlock(
-            in_channels=1024,
-            out_channels=1024,
-            kernel_size=(3,3),
-            stride=1,
-            padding=1,
-            groups=1
-        )
-        conv5_4 = CNNBlock(
-            in_channels=1024,
-            out_channels=1024,
-            kernel_size=(3,3),
-            stride=2,
-            padding=1,
-            groups=1
-        )
-        conv6 = CNNBlock(
-            in_channels=1024,
-            out_channels=1024,
-            kernel_size=(3,3),
-            stride=1,
-            padding=1,
-            groups=1
-        )
-        
-        conv4_1_2 = [
+        architecture = [
+            [in_channels, 192, 7, 2, 3, in_channels], 'M',
+            
+            [192, 256, 3, 1, 1, 1], 'M',
+            
+            [256, 128, 1, 1, 0, 1],
+            [128, 256, 3, 1, 1, 1],
+            [256, 256, 1, 1, 0, 1],
+            [256, 512, 3, 1, 1, 1], 'M',
+            
+            [512, 256, 1, 1, 0, 1],
+            [256, 512, 3, 1, 1, 1],
+            [512, 256, 1, 1, 0, 1],
+            [256, 512, 3, 1, 1, 1],
+            [512, 256, 1, 1, 0, 1],
+            [256, 512, 3, 1, 1, 1],
+            [512, 256, 1, 1, 0, 1],
+            [256, 512, 3, 1, 1, 1],
+            [512, 512, 1, 1, 0, 1],
+            [512, 1024, 3, 1, 1, 1], 'M',
+            
+            [1024, 512, 1, 1, 0, 1],
+            [512, 1024, 1, 1, 0, 1],
+            [1024, 512, 1, 1, 0, 1],
+            [512, 1024, 1, 1, 0, 1],
+            [1024, 1024, 3, 1, 1, 1],
+            [1024, 1024, 3, 2, 1, 1],
+            
+            [1024, 1024, 3, 1, 1, 1]
             
         ]
         
+        layers = [CNNBlock(
+            in_channels=x[0],
+            out_channels=x[1],
+            kernel_size=x[2],
+            stride=x[3],
+            padding=x[4],
+            groups=x[5]
+        ) if x != 'M' else nn.MaxPool2d(2, 2) for x in architecture]
+        
+        
+        
         block = nn.Sequential(
-            conv1, pool,
-            conv2, pool,
-            conv3_1, conv3_2, conv3_3, conv3_4, pool,
-            conv4_1, conv4_2, conv4_1, conv4_2, conv4_1,
-            conv4_2, conv4_1, conv4_2, conv4_3, conv4_4, pool,
-            conv5_1, conv5_2, conv5_1, conv5_2, conv5_3, conv5_4,
-            conv6, conv6,
-            
-            
+            *layers
         )
         return block
 
@@ -194,11 +103,14 @@ class Yolov1(nn.Module):
         S, B, C = split_size, num_boxes, num_classes
         
         block = nn.Sequential(
-            fc1, fc2
+            nn.Linear(7*7*1024, 4096),
+            nn.LeakyReLU(0.1),
+            nn.Linear(4096, S*S*(C+5*B))
         )
         
+        print(block)
+        
         return block
-        # YOUR CODE HERE
         
 if __name__ == '__main__':
     x = torch.ones(1, 3, 448, 448)

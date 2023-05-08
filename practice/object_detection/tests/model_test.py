@@ -43,7 +43,7 @@ class TestYolov1Model(unittest.TestCase):
     def test_fc_layers(self):
         model = Yolov1(in_channels=3, split_size=self.S, num_boxes=self.B,
                        num_classes=self.C)
-        output = model.fcs(self.fc_input)
+        output = model.fcs(torch.flatten(self.fc_input, start_dim=1))
         self.assertEqual(len(output.shape), len(self.expected_output_shape))
         self.assertEqual(output.shape, self.expected_output_shape)
 
