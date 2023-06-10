@@ -18,7 +18,7 @@ class VOCDataset(torch.utils.data.Dataset):
                  S: int = 7,
                  B: int = 2,
                  C: int = 20,
-                 download: bool = True,
+                 download: bool = False,
                  transform: Optional[Callable] = None) -> None:
         assert split in ('train', 'trainval', 'val')
         self.dataset = VOCDetection(root, image_set=split, download=download,
@@ -43,6 +43,8 @@ class VOCDataset(torch.utils.data.Dataset):
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, torch.Tensor]:
         image, labels = self.dataset[index]
 
+        print(labels)
+        
         image_width = self._str2float(labels['annotation']['size']['width'])
         image_height = self._str2float(labels['annotation']['size']['height'])
 
@@ -55,7 +57,7 @@ class VOCDataset(torch.utils.data.Dataset):
             height = self._str2float(box['ymax']) - y
             x, y = x / image_width, y / image_height
             width, height = width / image_width, height / image_height
-            boxes.append([class_label, x, y, width, height])
+            boxes.append([class_label, x + width / 2, y + height / 2, width, height])
         boxes = torch.tensor(boxes)
 
         if self.transform:
